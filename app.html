@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>EasyGen Pro</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red:       #ff4d4d;
+      --red-dark:  #b02030;
+      --red-glow:  rgba(255,77,77,0.18);
+      --red-dim:   rgba(176,32,48,0.25);
+      --surface:   #100a0d;
+      --surface2:  #160d10;
+      --surface3:  #1d1014;
+      --border:    rgba(255,255,255,0.06);
+      --border-r:  rgba(176,32,48,0.35);
+      --text:      #f0eded;
+      --text-muted:#a89898;
+      --text-dim:  #6b5555;
+    }
+
+    body {
+      font-family: "Inter", "Segoe UI", sans-serif;
+      background: #050307;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -10%, #2a0d18 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 80% 100%, #150810 0%, transparent 60%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px 60px;
+    }
+
+    /* ── Header ── */
+    .app-header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .logo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--red-dim);
+      border: 1px solid var(--border-r);
+      border-radius: 999px;
+      padding: 4px 14px 4px 10px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: #ff9090;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .logo-badge::before {
+      content: "";
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--red);
+      box-shadow: 0 0 6px var(--red);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    h1 {
+      font-size: 2.8rem;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #ffffff 0%, #ffb3b3 50%, #ff4d4d 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.1;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      font-weight: 300;
+      letter-spacing: 0.01em;
+      max-width: 480px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    .main-layout {
+      display: grid;
+      grid-template-columns: 200px minmax(0, 1fr);
+      width: 100%;
+      max-width: 1120px;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: sticky;
+      top: 24px;
+    }
+
+    .sidebar-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      padding: 0 4px;
+      margin-bottom: 4px;
+    }
+
+    .nav-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 11px 13px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--red-glow), transparent);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .nav-card:hover { border-color: var(--border-r); transform: translateX(2px); }
+    .nav-card:hover::before { opacity: 1; }
+    .nav-card.active { border-color: var(--red-dark); background: var(--surface3); }
+    .nav-card.active::before { opacity: 1; }
+
+    .nav-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: var(--red-dim);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+
+    .nav-card.active .nav-icon {
+      background: linear-gradient(135deg, var(--red-dark), var(--red));
+    }
+
+    .nav-text { flex: 1; }
+    .nav-title {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.2;
+    }
+    .nav-card.active .nav-title { color: #fff; }
+    .nav-sub {
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      margin-top: 1px;
+    }
+
+    .nav-arrow {
+      font-size: 10px;
+      color: var(--text-dim);
+      transition: transform 0.2s;
+    }
+    .nav-card:hover .nav-arrow, .nav-card.active .nav-arrow {
+      color: var(--red);
+      transform: translateX(2px);
+    }
+
+    /* ── Tool panel ── */
+    .tool-section {
+      display: none;
+      width: 100%;
+      background: var(--surface2);
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.5), 0 24px 48px rgba(0,0,0,0.6);
+    }
+
+    .tool-section.active { display: block; }
+
+    .tool-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, var(--surface3), var(--surface2));
+    }
+
+    .tool-header-left { display: flex; align-items: center; gap: 10px; }
+
+    .tool-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--red-dark), var(--red));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+    }
+
+    .tool-header h2 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    .back-btn {
+      padding: 6px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border-r);
+      background: transparent;
+      color: #ff9090;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+
+    .back-btn:hover { background: var(--red-dim); color: #fff; }
+
+    .tool-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+      gap: 0;
+    }
+
+    .tool-left {
+      padding: 20px;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .tool-right {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* ── Form elements ── */
+    .field-group { margin-bottom: 14px; }
+
+    .field-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.73rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .field-label .hint {
+      font-size: 0.68rem;
+      font-weight: 400;
+      text-transform: none;
+      letter-spacing: 0;
+      color: var(--text-dim);
+    }
+
+    textarea, input[type="text"], input[type="number"], select {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.85rem;
+      padding: 10px 12px;
+      transition: border-color 0.15s;
+      outline: none;
+      resize: vertical;
+    }
+
+    textarea { min-height: 100px; line-height: 1.5; }
+    textarea.neg { min-height: 56px; }
+
+    textarea:focus, input:focus, select:focus {
+      border-color: var(--border-r);
+      box-shadow: 0 0 0 3px rgba(176,32,48,0.12);
+    }
+
+    textarea::placeholder { color: var(--text-dim); }
+
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b5555' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 28px;
+    }
+
+    /* File input */
+    .file-upload {
+      position: relative;
+      width: 100%;
+    }
+
+    .file-upload input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; z-index: 2;
+    }
+
+    .file-upload-face {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface);
+      border: 1px dashed rgba(255,255,255,0.12);
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: border-color 0.15s;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .file-upload:hover .file-upload-face { border-color: var(--border-r); color: var(--text); }
+
+    .file-upload-face .upload-icon {
+      width: 28px; height: 28px;
+      border-radius: 7px;
+      background: var(--red-dim);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .file-name-display {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-top: 4px;
+      padding-left: 2px;
+    }
+
+    /* Upload preview */
+    .upload-preview {
+      width: 100%;
+      margin-top: 8px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      min-height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .upload-preview img {
+      max-width: 100%;
+      max-height: 130px;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    /* Sliders */
+    .slider-group { margin-bottom: 14px; }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 7px;
+    }
+
+    .slider-header .slider-label {
+      font-size: 0.73rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .slider-header .hint { font-size: 0.67rem; color: var(--text-dim); font-weight:400; text-transform:none; letter-spacing:0; }
+
+    .slider-val-badge {
+      background: var(--red-dim);
+      border: 1px solid var(--border-r);
+      border-radius: 6px;
+      padding: 1px 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #ff9090;
+      min-width: 44px;
+      text-align: center;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 4px;
+      accent-color: var(--red);
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      padding: 0;
+    }
+
+    /* Run button */
+    .run-btn {
+      width: 100%;
+      padding: 11px 0;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, var(--red-dark) 0%, var(--red) 100%);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      transition: all 0.18s ease;
+      position: relative;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .run-btn::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent, rgba(255,255,255,0.1));
+      opacity: 0;
+      transition: opacity 0.18s;
+    }
+
+    .run-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(176,32,48,0.5); }
+    .run-btn:hover::before { opacity: 1; }
+    .run-btn:active { transform: translateY(0); }
+    .run-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* Status bar */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 10px;
+      min-height: 20px;
+      font-size: 0.75rem;
+      color: #ffb347;
+      font-weight: 500;
+    }
+
+    .status-bar .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--red);
+      display: none;
+      box-shadow: 0 0 6px var(--red);
+      animation: pulse 1s infinite;
+    }
+
+    .status-bar.active .dot { display: inline-block; }
+
+    /* Preview box */
+    .preview-box {
+      flex: 1;
+      border-radius: 12px;
+      border: 1px dashed rgba(255,255,255,0.08);
+      background: var(--surface);
+      min-height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 8px;
+      color: var(--text-dim);
+      font-size: 0.82rem;
+      text-align: center;
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .preview-box::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at top left, rgba(176,32,48,0.06), transparent 60%);
+      pointer-events: none;
+    }
+
+    .preview-box img {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 10px;
+      object-fit: contain;
+      position: relative;
+      z-index: 1;
+    }
+
+    .preview-box video {
+      max-width: 100%;
+      border-radius: 10px;
+    }
+
+    .preview-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .preview-placeholder .ph-icon {
+      width: 48px; height: 48px;
+      border-radius: 14px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+    }
+
+    .preview-placeholder p { font-size: 0.8rem; color: var(--text-dim); }
+
+    /* Download button */
+    .download-btn {
+      width: 100%;
+      padding: 9px;
+      border-radius: 10px;
+      border: 1px solid var(--border-r);
+      background: var(--red-dim);
+      color: #ff9090;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+
+    .download-btn:hover { background: var(--red-dark); color: #fff; }
+
+    /* Params card */
+    .params-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.73rem;
+      color: var(--text-muted);
+      line-height: 2;
+    }
+
+    /* Divider */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 14px 0;
+    }
+
+    /* Section label inside tool */
+    .section-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #ff9090;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .section-label::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border-r);
+      opacity: 0.4;
+    }
+
+    /* Brush control box */
+    .brush-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    /* Brush tool buttons */
+    .brush-tools {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .brush-tool-btn {
+      flex: 1;
+      padding: 7px 4px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+    }
+
+    .brush-tool-btn.active, .brush-tool-btn:hover {
+      background: var(--red-dim);
+      border-color: var(--border-r);
+      color: #ff9090;
+    }
+
+    .mode-hint {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      margin-bottom: 12px;
+    }
+    .mode-hint strong { color: #ffb3b3; }
+
+    /* Canvas wrap */
+    #bgCanvasWrap {
+      border-radius: 12px;
+      border: 1px dashed rgba(255,255,255,0.1);
+      background: var(--surface);
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      cursor: crosshair;
+      position: relative;
+    }
+
+    /* Number inputs row */
+    .inputs-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    /* Mobile */
+    @media (max-width: 820px) {
+      .main-layout { grid-template-columns: 1fr; }
+      .sidebar { position: static; flex-direction: row; flex-wrap: wrap; }
+      .sidebar-label { width: 100%; }
+      .nav-card { min-width: 140px; flex: 1; }
+      .tool-body { grid-template-columns: 1fr; }
+      .tool-left { border-right: none; border-bottom: 1px solid var(--border); }
+      h1 { font-size: 2rem; }
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--red-dim); border-radius: 99px; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="logo-badge">AI Generation Studio</div>
+    <h1>EasyGen Pro</h1>
+    <p class="subtitle">Transform your imagination into stunning visuals with state-of-the-art diffusion models</p>
+  </header>
+
+  <div class="main-layout">
+
+    <!-- Sidebar -->
+    <nav class="sidebar">
+      <div class="sidebar-label">Tools</div>
+
+      <div class="nav-card active" id="nav-t2i" onclick="openTool('t2i')">
+        <div class="nav-icon">&#x1F5BC;</div>
+        <div class="nav-text">
+          <div class="nav-title">Text to Image</div>
+          <div class="nav-sub">Prompt &rarr; image</div>
+        </div>
+        <span class="nav-arrow">&#x276F;</span>
+      </div>
+
+      <div class="nav-card" id="nav-t2v" onclick="openTool('t2v')">
+        <div class="nav-icon">&#x1F3AC;</div>
+        <div class="nav-text">
+          <div class="nav-title">Text to Video</div>
+          <div class="nav-sub">Prompt &rarr; video</div>
+        </div>
+        <span class="nav-arrow">&#x276F;</span>
+      </div>
+
+      <div class="nav-card" id="nav-img2img" onclick="openTool('img2img')">
+        <div class="nav-icon">&#x1F504;</div>
+        <div class="nav-text">
+          <div class="nav-title">Style Transfer</div>
+          <div class="nav-sub">Restyle any image</div>
+        </div>
+        <span class="nav-arrow">&#x276F;</span>
+      </div>
+
+      <div class="nav-card" id="nav-i2v" onclick="openTool('i2v')">
+        <div class="nav-icon">&#x1F3A5;</div>
+        <div class="nav-text">
+          <div class="nav-title">Image to Video</div>
+          <div class="nav-sub">Add motion</div>
+        </div>
+        <span class="nav-arrow">&#x276F;</span>
+      </div>
+
+      <div class="nav-card" id="nav-gemini" onclick="openTool('gemini')">
+        <div class="nav-icon">&#x26A1;</div>
+        <div class="nav-text">
+          <div class="nav-title">Image Transformer</div>
+          <div class="nav-sub">Advanced img2img</div>
+        </div>
+        <span class="nav-arrow">&#x276F;</span>
+      </div>
+
+      <div class="nav-card" id="nav-bgreplace" onclick="openTool('bgreplace')">
+        <div class="nav-icon">&#x1F30D;</div>
+        <div class="nav-text">
+          <div class="nav-title">Change Background</div>
+          <div class="nav-sub">Fill &amp; replace regions</div>
+        </div>
+        <span class="nav-arrow">&#x276F;</span>
+      </div>
+    </nav>
+
+    <!-- Tool Panels -->
+    <main>
+
+      <!-- Text to Image -->
+      <section id="t2i" class="tool-section active">
+        <div class="tool-header">
+          <div class="tool-header-left">
+            <div class="tool-icon">&#x1F5BC;</div>
+            <h2>Text to Image</h2>
+          </div>
+          <button class="back-btn" onclick="closeTools()">&#x2190; All tools</button>
+        </div>
+        <div class="tool-body">
+          <div class="tool-left">
+            <div class="field-group">
+              <div class="field-label">Prompt</div>
+              <textarea id="t2iPrompt" placeholder="A majestic lion in a cyberpunk city, neon lights, 4K, highly detailed, cinematic lighting"></textarea>
+            </div>
+            <button id="t2iButton" class="run-btn" onclick="generateT2I()">&#x2728; Generate Image</button>
+            <div class="status-bar" id="t2iStatus"><span class="dot"></span><span id="t2iStatusText"></span></div>
+          </div>
+          <div class="tool-right">
+            <div class="preview-box">
+              <img id="t2iOutput" alt="Generated image" style="display:none;" />
+              <div id="t2iPlaceholder" class="preview-placeholder">
+                <div class="ph-icon">&#x1F5BC;</div>
+                <p>Your generated image will appear here</p>
+              </div>
+            </div>
+            <button class="download-btn" id="t2iDlBtn" style="display:none" onclick="downloadImage('t2iOutput','generated.png')">&#x2B07; Download Image</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Text to Video -->
+      <section id="t2v" class="tool-section">
+        <div class="tool-header">
+          <div class="tool-header-left">
+            <div class="tool-icon">&#x1F3AC;</div>
+            <h2>Text to Video</h2>
+          </div>
+          <button class="back-btn" onclick="closeTools()">&#x2190; All tools</button>
+        </div>
+        <div class="tool-body">
+          <div class="tool-left">
+            <div class="field-group">
+              <div class="field-label">Prompt</div>
+              <textarea id="t2vPrompt" placeholder="Singer on a neon stage, camera slowly circling, cinematic music video style"></textarea>
+            </div>
+            <div class="inputs-row">
+              <div class="field-group">
+                <div class="field-label">Frames <span class="hint">(8–32)</span></div>
+                <input id="t2vFrames" type="number" min="8" max="32" value="16" />
+              </div>
+              <div class="field-group">
+                <div class="field-label">FPS <span class="hint">(4–12)</span></div>
+                <input id="t2vFps" type="number" min="4" max="12" value="8" />
+              </div>
+            </div>
+            <button id="t2vButton" class="run-btn" onclick="generateT2V()">&#x25B6; Generate Video</button>
+            <div class="status-bar" id="t2vStatus"><span class="dot"></span><span id="t2vStatusText"></span></div>
+          </div>
+          <div class="tool-right">
+            <div class="preview-box">
+              <video id="t2vOutput" controls style="display:none; max-width:100%; border-radius:10px;"></video>
+              <div id="t2vPlaceholder" class="preview-placeholder">
+                <div class="ph-icon">&#x1F3AC;</div>
+                <p>Generated video will appear here</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Style Transfer (img2img basic) -->
+      <section id="img2img" class="tool-section">
+        <div class="tool-header">
+          <div class="tool-header-left">
+            <div class="tool-icon">&#x1F504;</div>
+            <h2>Style Transfer</h2>
+          </div>
+          <button class="back-btn" onclick="closeTools()">&#x2190; All tools</button>
+        </div>
+        <div class="tool-body">
+          <div class="tool-left">
+            <div class="field-group">
+              <div class="field-label">Style Prompt</div>
+              <textarea id="img2imgPrompt" placeholder="Make this image look like a neon cyberpunk artwork, highly detailed"></textarea>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Input Image</div>
+              <div class="file-upload">
+                <input id="img2imgFile" type="file" accept="image/*" />
+                <div class="file-upload-face">
+                  <div class="upload-icon">&#x1F4C2;</div>
+                  <span>Click to upload image</span>
+                </div>
+              </div>
+            </div>
+            <button id="img2imgButton" class="run-btn" onclick="generateImg2Img()">&#x1F504; Transform Style</button>
+          </div>
+          <div class="tool-right">
+            <div class="preview-box">
+              <img id="img2imgOutput" alt="Img2Img output" style="display:none;" />
+              <div id="img2imgPlaceholder" class="preview-placeholder">
+                <div class="ph-icon">&#x1F504;</div>
+                <p>Transformed image will appear here</p>
+              </div>
+            </div>
+            <button class="download-btn" id="img2imgDlBtn" style="display:none" onclick="downloadImage('img2imgOutput','styled.png')">&#x2B07; Download</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Image to Video -->
+      <section id="i2v" class="tool-section">
+        <div class="tool-header">
+          <div class="tool-header-left">
+            <div class="tool-icon">&#x1F3A5;</div>
+            <h2>Image to Video</h2>
+          </div>
+          <button class="back-btn" onclick="closeTools()">&#x2190; All tools</button>
+        </div>
+        <div class="tool-body">
+          <div class="tool-left">
+            <div class="field-group">
+              <div class="field-label">Motion Prompt</div>
+              <textarea id="i2vPrompt" placeholder="Camera slowly circling around the subject, soft cinematic lighting"></textarea>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Quality</div>
+              <select id="i2vQuality">
+                <option value="fast">Fast</option>
+                <option value="good" selected>Good</option>
+                <option value="best">Best</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Input Image</div>
+              <div class="file-upload">
+                <input id="i2vFile" type="file" accept="image/*" />
+                <div class="file-upload-face">
+                  <div class="upload-icon">&#x1F4C2;</div>
+                  <span>Click to upload image</span>
+                </div>
+              </div>
+            </div>
+            <button id="i2vButton" class="run-btn" onclick="generateI2V()">&#x25B6; Generate Video</button>
+          </div>
+          <div class="tool-right">
+            <div class="preview-box" style="min-height:220px; flex-direction:column; gap:12px;">
+              <div id="i2vPlaceholder" class="preview-placeholder">
+                <div class="ph-icon">&#x1F3A5;</div>
+                <p>Video download link will appear here</p>
+              </div>
+              <a id="i2vDownload" href="#" download style="display:none;">
+                <button class="download-btn" style="margin:0;">&#x2B07; Download Video</button>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Advanced Image Transformer -->
+      <section id="gemini" class="tool-section">
+        <div class="tool-header">
+          <div class="tool-header-left">
+            <div class="tool-icon">&#x26A1;</div>
+            <h2>Image Transformer — Advanced</h2>
+          </div>
+          <button class="back-btn" onclick="closeTools()">&#x2190; All tools</button>
+        </div>
+        <div class="tool-body">
+          <div class="tool-left">
+            <div class="section-label">Prompts</div>
+            <div class="field-group">
+              <div class="field-label">Positive Prompt</div>
+              <textarea id="geminiPrompt" placeholder="cyberpunk neon style, ultra detailed, 8k, cinematic lighting, sharp focus, masterpiece"></textarea>
+            </div>
+            <div class="field-group">
+              <div class="field-label">Negative Prompt</div>
+              <textarea class="neg" id="geminiNegPrompt" placeholder="blurry, low quality, distorted, deformed, watermark, text, bad anatomy"></textarea>
+            </div>
+
+            <div class="section-label">Input Image</div>
+            <div class="field-group">
+              <div class="file-upload">
+                <input id="geminiFile" type="file" accept="image/*" onchange="previewInput(this,'geminiPreviewImg')" />
+                <div class="file-upload-face">
+                  <div class="upload-icon">&#x1F4C2;</div>
+                  <span id="geminiFileLabel">Click to upload image</span>
+                </div>
+              </div>
+              <div class="upload-preview" id="geminiPreviewWrap" style="display:none;">
+                <img id="geminiPreviewImg" style="display:none;" />
+              </div>
+            </div>
+
+            <div class="section-label">Parameters</div>
+            <div class="field-group">
+              <div class="field-label">Scheduler</div>
+              <select id="geminiScheduler">
+                <option value="UniPC" selected>UniPC — best for SD 2.1</option>
+                <option value="DPMSolverMultistep">DPM++ 2M — fast + quality</option>
+                <option value="DDIM">DDIM — balanced</option>
+                <option value="EulerAncestral">Euler Ancestral — creative</option>
+                <option value="PNDM">PNDM — stable</option>
+              </select>
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-header">
+                <span class="slider-label">Denoising Strength <span class="hint">— lower = closer to original</span></span>
+                <span class="slider-val-badge" id="geminiStrengthVal">0.60</span>
+              </div>
+              <input type="range" id="geminiStrength" min="0.1" max="1.0" step="0.05" value="0.6"
+                oninput="document.getElementById('geminiStrengthVal').textContent=parseFloat(this.value).toFixed(2)" />
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-header">
+                <span class="slider-label">CFG Scale <span class="hint">— prompt adherence</span></span>
+                <span class="slider-val-badge" id="geminiCFGVal">7.5</span>
+              </div>
+              <input type="range" id="geminiCFG" min="1" max="20" step="0.5" value="7.5"
+                oninput="document.getElementById('geminiCFGVal').textContent=parseFloat(this.value).toFixed(1)" />
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-header">
+                <span class="slider-label">Inference Steps <span class="hint">— quality vs speed</span></span>
+                <span class="slider-val-badge" id="geminiStepsVal">40</span>
+              </div>
+              <input type="range" id="geminiSteps" min="10" max="80" step="5" value="40"
+                oninput="document.getElementById('geminiStepsVal').textContent=this.value" />
+            </div>
+
+            <div class="field-group">
+              <div class="field-label">Output Size <span class="hint">— SD 2.1 native: 768&times;768</span></div>
+              <select id="geminiSize">
+                <option value="512x512">512 &times; 512 — fast</option>
+                <option value="768x512">768 &times; 512 — landscape</option>
+                <option value="512x768">512 &times; 768 — portrait</option>
+                <option value="768x768" selected>768 &times; 768 — native quality &#x2B50;</option>
+              </select>
+            </div>
+
+            <button id="geminiButton" class="run-btn" onclick="generateGeminiImg2Img()">&#x1F3A8; Transform Image</button>
+            <div class="status-bar" id="geminiStatus"><span class="dot"></span><span id="geminiStatusText"></span></div>
+          </div>
+
+          <div class="tool-right">
+            <div class="preview-box" style="min-height:320px;">
+              <img id="geminiOutput" alt="Transformed image" style="display:none;" />
+              <div id="geminiPlaceholder" class="preview-placeholder">
+                <div class="ph-icon">&#x26A1;</div>
+                <p>Transformed image will appear here</p>
+              </div>
+            </div>
+            <button class="download-btn" id="geminiDownloadBtn" style="display:none"
+              onclick="downloadImage('geminiOutput','transformed.png')">&#x2B07; Download Image</button>
+            <div id="geminiParamsCard" class="params-card" style="display:none;"></div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- Change Background (LaMa mode=bg, MODEL6.ipynb) -->
+      <section id="bgreplace" class="tool-section">
+        <div class="tool-header">
+          <div class="tool-header-left">
+            <div class="tool-icon">&#x1F30D;</div>
+            <h2>Change Background</h2>
+          </div>
+          <button class="back-btn" onclick="closeTools()">&#x2190; All tools</button>
+        </div>
+        <div class="tool-body">
+          <div class="tool-left">
+            <p class="mode-hint"><strong>How it works:</strong> Paint the person to <strong>keep</strong> (green), describe the new scene, then run. Requires <strong>MODEL6.ipynb</strong> in Colab (SD inpainting) — prompts like &quot;forest&quot; work. Wait 30–60s per image.</p>
+            <div class="section-label">New background</div>
+            <div class="field-group">
+              <div class="field-label">Describe the scene</div>
+              <textarea id="bgPrompt" placeholder="tropical beach at golden hour, professional photo, 8k, photorealistic"></textarea>
+            </div>
+            <div class="section-label">Upload &amp; mask subject</div>
+            <div class="field-group">
+              <div class="file-upload">
+                <input id="bgFile" type="file" accept="image/*" onchange="bgLoadImage(this)" />
+                <div class="file-upload-face">
+                  <div class="upload-icon">&#x1F4C2;</div>
+                  <span>Click to upload photo</span>
+                </div>
+              </div>
+            </div>
+            <div class="brush-box">
+              <div class="section-label" style="margin-bottom:10px;">Mask brush <span class="hint">- paint subject to keep</span></div>
+              <div class="slider-group">
+                <div class="slider-header">
+                  <span class="slider-label">Size</span>
+                  <span class="slider-val-badge" id="bgBrushSizeVal">40px</span>
+                </div>
+                <input type="range" id="bgBrushSize" min="5" max="120" value="40"
+                  oninput="document.getElementById('bgBrushSizeVal').textContent=this.value+'px'" />
+              </div>
+              <div class="slider-group">
+                <div class="slider-header">
+                  <span class="slider-label">Opacity</span>
+                  <span class="slider-val-badge" id="bgBrushOpacityVal">90%</span>
+                </div>
+                <input type="range" id="bgBrushOpacity" min="0.3" max="1.0" step="0.05" value="0.9"
+                  oninput="document.getElementById('bgBrushOpacityVal').textContent=Math.round(this.value*100)+'%'" />
+              </div>
+              <div class="brush-tools">
+                <button class="brush-tool-btn active" id="btnBgPaint" onclick="setBgTool('paint')">&#x270F; Paint subject</button>
+                <button class="brush-tool-btn" id="btnBgErase" onclick="setBgTool('erase')">&#x1F9F9; Erase</button>
+                <button class="brush-tool-btn" onclick="clearBgMask()">&#x1F5D1; Clear mask</button>
+              </div>
+            </div>
+            <div class="section-label">Edge blend</div>
+            <div class="slider-group">
+              <div class="slider-header">
+                <span class="slider-label">Mask blur</span>
+                <span class="slider-val-badge" id="bgBlurVal">6</span>
+              </div>
+              <input type="range" id="bgBlur" min="0" max="20" step="1" value="6"
+                oninput="document.getElementById('bgBlurVal').textContent=this.value" />
+            </div>
+            <button id="bgButton" class="run-btn" onclick="runBackgroundChange()">&#x1F30D; Change Background</button>
+            <div class="status-bar" id="bgStatus"><span class="dot"></span><span id="bgStatusText"></span></div>
+          </div>
+          <div class="tool-right">
+            <div style="font-size:0.73rem;color:var(--text-muted);margin-bottom:6px;font-weight:500;text-transform:uppercase;">Paint subject to keep (green)</div>
+            <div id="bgCanvasWrap" style="position:relative;">
+              <canvas id="bgCanvas" style="display:block;border-radius:12px;"></canvas>
+              <canvas id="bgMask" style="position:absolute;top:0;left:0;border-radius:12px;opacity:0.5;"></canvas>
+              <div id="bgCanvasPlaceholder" class="preview-placeholder" style="position:absolute;inset:0;">
+                <div class="ph-icon">&#x1F30D;</div>
+                <p>Upload a photo, then paint the subject</p>
+              </div>
+            </div>
+            <div style="margin-top:14px;">
+              <div id="bgOutputBox" style="min-height:180px;border-radius:12px;border:1px dashed rgba(255,255,255,0.08);background:var(--surface);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:16px;">
+                <div id="bgOutputPlaceholder" class="preview-placeholder">
+                  <div class="ph-icon">&#x2728;</div>
+                  <p>Step 2: Your new background (forest, etc.) appears here — scroll down after Done</p>
+                </div>
+                <img id="bgOutput" alt="Result" style="display:none;max-width:100%;max-height:360px;border-radius:10px;object-fit:contain;" />
+              </div>
+              <button class="download-btn" id="bgDownloadBtn" style="display:none;margin-top:10px;"
+                onclick="downloadImage('bgOutput','new-background.png')">&#x2B07; Download Result</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+<script>
+  /* ──────────── BASE URLS ──────────── */
+  const BASE_URL_IMG     = "https://nondiffuse-unrespectable-lissa.ngrok-free.dev";
+  const BASE_URL_T2V     = "https://proart-nonfictively-georgetta.ngrok-free.dev";
+  const BASE_URL_IMG2IMG = "https://prescriptively-hypertrophic-daren.ngrok-free.dev";
+  const BASE_URL_I2V     = "https://encephalographic-leena-unrepulsing.ngrok-free.dev";
+
+  // ⬇  UPDATE THIS to your Colab ngrok URL after running the backend notebook
+  const BASE_URL_GEMINI  = "https://YOUR-COLAB-NGROK-URL.ngrok-free.app";
+
+  // Change Background backend (MODEL6.ipynb ngrok URL)
+  const BASE_URL_BG = "https://semifitted-jordyn-blushingly.ngrok-free.dev";
+
+  /* ──────────── HELPERS ──────────── */
+  function setStatus(id, msg, active = true) {
+    const bar = document.getElementById(id);
+    const txt = document.getElementById(id + "Text");
+    if (!bar || !txt) return;
+    txt.textContent = msg;
+    bar.classList.toggle("active", active && !!msg);
+  }
+
+  function previewInput(input, imgId) {
+    const file = input.files[0];
+    const img = document.getElementById(imgId);
+    const lbl = document.getElementById(imgId.replace("Img","Label"));
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    img.src = url;
+    img.style.display = "";
+    if (lbl) lbl.style.display = "none";
+    const wrap = document.getElementById(imgId.replace("PreviewImg","PreviewWrap"));
+    if (wrap) wrap.style.display = "";
+  }
+
+  function downloadImage(imgId, filename) {
+    const img = document.getElementById(imgId);
+    if (!img || !img.src) return;
+    const a = document.createElement("a");
+    a.href = img.src;
+    a.download = filename;
+    a.click();
+  }
+
+  /* ──────────── TEXT TO IMAGE ──────────── */
+  async function generateT2I() {
+    const prompt = document.getElementById("t2iPrompt").value;
+    const btn = document.getElementById("t2iButton");
+    const outImg = document.getElementById("t2iOutput");
+    const placeholder = document.getElementById("t2iPlaceholder");
+    btn.disabled = true; btn.textContent = "Generating...";
+    try {
+      const res = await fetch(BASE_URL_IMG + "/api/text2img", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt })
+      });
+      if (!res.ok) throw new Error("Server responded " + res.status);
+      const blob = await res.blob();
+      outImg.src = URL.createObjectURL(blob);
+      outImg.style.display = ""; placeholder.style.display = "none";
+      const dl = document.getElementById("t2iDlBtn"); if(dl) dl.style.display="";
+    } catch (err) {
+      alert("Failed to generate image: " + err.message);
+    } finally {
+      btn.disabled = false; btn.textContent = "✨ Generate Image";
+    }
+  }
+
+  /* ──────────── TEXT TO VIDEO ──────────── */
+  async function generateT2V() {
+    const prompt = document.getElementById("t2vPrompt").value;
+    const frames = parseInt(document.getElementById("t2vFrames").value || "16", 10);
+    const fps = parseInt(document.getElementById("t2vFps").value || "8", 10);
+    const btn = document.getElementById("t2vButton");
+    const outVideo = document.getElementById("t2vOutput");
+    const placeholder = document.getElementById("t2vPlaceholder");
+    btn.disabled = true; btn.textContent = "Generating...";
+    try {
+      const res = await fetch(BASE_URL_T2V + "/api/text2video", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt, num_frames: frames, fps })
+      });
+      if (!res.ok) throw new Error("Server responded " + res.status);
+      const blob = await res.blob();
+      outVideo.src = URL.createObjectURL(blob);
+      outVideo.style.display = ""; placeholder.style.display = "none";
+    } catch (err) {
+      alert("Failed to generate video: " + err.message);
+    } finally {
+      btn.disabled = false; btn.textContent = "Generate Video";
+    }
+  }
+
+  /* ──────────── IMG2IMG (basic) ──────────── */
+  async function generateImg2Img() {
+    const prompt = document.getElementById("img2imgPrompt").value;
+    const fileInput = document.getElementById("img2imgFile");
+    if (!fileInput.files.length) { alert("Upload an image first."); return; }
+    const btn = document.getElementById("img2imgButton");
+    const outImg = document.getElementById("img2imgOutput");
+    const placeholder = document.getElementById("img2imgPlaceholder");
+    btn.disabled = true; btn.textContent = "Generating...";
+    try {
+      const form = new FormData();
+      form.append("prompt", prompt);
+      form.append("image", fileInput.files[0]);
+      form.append("strength", "0.6");
+      form.append("guidance_scale", "5.0");
+      const res = await fetch(BASE_URL_IMG2IMG + "/api/img2img", { method: "POST", body: form });
+      if (!res.ok) throw new Error("Server responded " + res.status);
+      const blob = await res.blob();
+      outImg.src = URL.createObjectURL(blob);
+      outImg.style.display = ""; placeholder.style.display = "none";
+      const dl = document.getElementById("img2imgDlBtn"); if(dl) dl.style.display="";
+    } catch (e) {
+      alert("Failed to generate image: " + e.message);
+    } finally {
+      btn.disabled = false; btn.textContent = "↺ Transform Style";
+    }
+  }
+
+  /* ──────────── IMAGE TO VIDEO ──────────── */
+  async function generateI2V() {
+    const prompt = document.getElementById("i2vPrompt").value;
+    const quality = document.getElementById("i2vQuality").value;
+    const fileInput = document.getElementById("i2vFile");
+    if (!fileInput.files.length) { alert("Upload an image first."); return; }
+    const btn = document.getElementById("i2vButton");
+    const downloadLink = document.getElementById("i2vDownload");
+    const placeholder = document.getElementById("i2vPlaceholder");
+    btn.disabled = true; btn.textContent = "Generating...";
+    try {
+      const form = new FormData();
+      form.append("prompt", prompt);
+      form.append("quality", quality);
+      form.append("image", fileInput.files[0]);
+      const res = await fetch(BASE_URL_I2V + "/api/image2video", { method: "POST", body: form });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || ("Server responded " + res.status));
+      downloadLink.href = BASE_URL_I2V + data.video_url;
+      downloadLink.style.display = "inline";
+      placeholder.style.display = "none";
+    } catch (e) {
+      alert("Failed to generate video: " + e.message);
+    } finally {
+      btn.disabled = false; btn.textContent = "Generate Video";
+    }
+  }
+
+  /* ══════════════════════════════════════════════
+     ADVANCED IMAGE TRANSFORMER — Colab Backend
+     ══════════════════════════════════════════════ */
+  async function generateGeminiImg2Img() {
+    const prompt    = document.getElementById("geminiPrompt").value.trim();
+    const negPrompt = document.getElementById("geminiNegPrompt").value.trim();
+    const fileInput = document.getElementById("geminiFile");
+    const strength  = parseFloat(document.getElementById("geminiStrength").value);
+    const cfg       = parseFloat(document.getElementById("geminiCFG").value);
+    const steps     = parseInt(document.getElementById("geminiSteps").value, 10);
+    const scheduler = document.getElementById("geminiScheduler").value;
+    const size      = document.getElementById("geminiSize").value;
+    const [width, height] = size.split("x").map(Number);
+
+    if (!prompt)               { alert("Please enter a prompt."); return; }
+    if (!fileInput.files.length) { alert("Upload an input image first."); return; }
+
+    const btn         = document.getElementById("geminiButton");
+    const outImg      = document.getElementById("geminiOutput");
+    const placeholder = document.getElementById("geminiPlaceholder");
+    const dlBtn       = document.getElementById("geminiDownloadBtn");
+    const paramsCard  = document.getElementById("geminiParamsCard");
+
+    btn.disabled = true;
+    btn.textContent = "Transforming…";
+    outImg.style.display = "none";
+    placeholder.style.display = "";
+    placeholder.textContent = "⏳ Sending to Colab backend…";
+    dlBtn.style.display = "none";
+    paramsCard.style.display = "none";
+    setStatus("geminiStatus", "Uploading image…");
+
+    try {
+      const form = new FormData();
+      form.append("image",         fileInput.files[0]);
+      form.append("prompt",        prompt);
+      form.append("neg_prompt",    negPrompt || "blurry, low quality, distorted, watermark");
+      form.append("strength",      strength.toFixed(2));
+      form.append("guidance_scale",cfg.toFixed(1));
+      form.append("num_steps",     steps);
+      form.append("scheduler",     scheduler);
+      form.append("width",         width);
+      form.append("height",        height);
+
+      setStatus("geminiStatus", `Running ${steps} diffusion steps…`);
+
+      const res = await fetch(BASE_URL_GEMINI + "/api/img2img", {
+        method: "POST",
+        body: form
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(`Server error ${res.status}: ${errText}`);
+      }
+
+      const blob = await res.blob();
+      const url  = URL.createObjectURL(blob);
+
+      outImg.src = url;
+      outImg.style.display = "";
+      placeholder.style.display = "none";
+      dlBtn.style.display = "inline-block";
+
+      // Show params used
+      paramsCard.innerHTML = `
+        <strong style="color:#ff9090">Generation params used:</strong><br>
+        🎯 Strength: <b>${strength}</b> &nbsp;|&nbsp;
+        📐 CFG: <b>${cfg}</b> &nbsp;|&nbsp;
+        🔁 Steps: <b>${steps}</b><br>
+        ⚙️ Scheduler: <b>${scheduler}</b> &nbsp;|&nbsp;
+        📏 Size: <b>${width}×${height}</b>
+      `;
+      paramsCard.style.display = "block";
+      setStatus("geminiStatus", "✅ Done!", false);
+
+    } catch (e) {
+      console.error(e);
+      placeholder.textContent = "❌ Error: " + e.message;
+      setStatus("geminiStatus", "Failed — check console", false);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "🎨 Transform Image";
+    }
+  }
+
+  /* ──────────── NAV ──────────── */
+  function openTool(id) {
+    document.querySelectorAll(".tool-section").forEach(s => s.classList.remove("active"));
+    document.querySelectorAll(".nav-card").forEach(n => n.classList.remove("active"));
+    const sec = document.getElementById(id);
+    if (sec) sec.classList.add("active");
+    const nav = document.getElementById("nav-" + id);
+    if (nav) nav.classList.add("active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function closeTools() {
+    document.querySelectorAll(".tool-section").forEach(s => s.classList.remove("active"));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  document.addEventListener("DOMContentLoaded", () => openTool("t2i"));
+
+
+  /* ══════════════════════════════════════════════
+     CHANGE BACKGROUND — paint subject, LaMa mode=bg
+     ══════════════════════════════════════════════ */
+  let bgTool = "paint";
+  let bgDrawing = false;
+  window.bgOriginalImage = null;
+  window.bgNaturalW = 0;
+  window.bgNaturalH = 0;
+
+  function bgLoadImage(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      window.bgOriginalImage = img;
+      window.bgNaturalW = img.naturalWidth;
+      window.bgNaturalH = img.naturalHeight;
+      const wrap = document.getElementById("bgCanvasWrap");
+      const maxW = wrap.clientWidth || 420;
+      const scale = Math.min(1, maxW / img.naturalWidth);
+      const dispW = Math.round(img.naturalWidth * scale);
+      const dispH = Math.round(img.naturalHeight * scale);
+      const bgCanvas = document.getElementById("bgCanvas");
+      bgCanvas.width = dispW; bgCanvas.height = dispH;
+      bgCanvas.style.width = dispW + "px"; bgCanvas.style.height = dispH + "px";
+      bgCanvas.getContext("2d").drawImage(img, 0, 0, dispW, dispH);
+      const maskCanvas = document.getElementById("bgMask");
+      maskCanvas.width = dispW; maskCanvas.height = dispH;
+      maskCanvas.style.width = dispW + "px"; maskCanvas.style.height = dispH + "px";
+      maskCanvas.getContext("2d").clearRect(0, 0, dispW, dispH);
+      document.getElementById("bgCanvasPlaceholder").style.display = "none";
+      attachBgEvents(maskCanvas);
+    };
+    img.src = url;
+  }
+
+  function attachBgEvents(canvas) {
+    canvas.onmousedown = (e) => { bgDrawing = true; bgDraw(e, canvas); };
+    canvas.onmousemove = (e) => { if (bgDrawing) bgDraw(e, canvas); };
+    canvas.onmouseup = () => { bgDrawing = false; };
+    canvas.onmouseleave = () => { bgDrawing = false; };
+    canvas.ontouchstart = (e) => { e.preventDefault(); bgDrawing = true; bgDraw(e.touches[0], canvas); };
+    canvas.ontouchmove = (e) => { e.preventDefault(); if (bgDrawing) bgDraw(e.touches[0], canvas); };
+    canvas.ontouchend = () => { bgDrawing = false; };
+  }
+
+  function bgDraw(e, canvas) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
+    const ctx = canvas.getContext("2d");
+    const size = parseInt(document.getElementById("bgBrushSize").value, 10);
+    const opacity = parseFloat(document.getElementById("bgBrushOpacity").value);
+    ctx.save();
+    if (bgTool === "erase") {
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.globalAlpha = 1.0;
+    } else {
+      ctx.globalCompositeOperation = "source-over";
+      ctx.globalAlpha = opacity;
+    }
+    ctx.beginPath();
+    ctx.arc(x, y, size / 2, 0, Math.PI * 2);
+    ctx.fillStyle = "#00e676";
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function setBgTool(tool) {
+    bgTool = tool;
+    document.getElementById("btnBgPaint").classList.toggle("active", tool === "paint");
+    document.getElementById("btnBgErase").classList.toggle("active", tool === "erase");
+  }
+
+  function clearBgMask() {
+    document.getElementById("bgMask").getContext("2d").clearRect(0, 0,
+      document.getElementById("bgMask").width, document.getElementById("bgMask").height);
+  }
+
+  async function runBackgroundChange() {
+    const prompt = document.getElementById("bgPrompt").value.trim();
+    const blur = parseInt(document.getElementById("bgBlur").value, 10);
+    if (!prompt) { alert("Please describe the new background."); return; }
+    if (!window.bgOriginalImage) { alert("Please upload an image first."); return; }
+    const maskCanvas = document.getElementById("bgMask");
+    const maskData = maskCanvas.getContext("2d").getImageData(0, 0, maskCanvas.width, maskCanvas.height);
+    const hasMask = (() => {
+      const d = maskData.data;
+      for (let i = 0; i < d.length; i += 4) {
+        if (d[i + 3] > 20 && (d[i + 1] > 60 || d[i] > 60)) return true;
+      }
+      return false;
+    })();
+    if (!hasMask) { alert("Please paint over the subject you want to keep."); return; }
+    const btn = document.getElementById("bgButton");
+    const outImg = document.getElementById("bgOutput");
+    const outPh = document.getElementById("bgOutputPlaceholder");
+    const phP = outPh.querySelector("p");
+    const dlBtn = document.getElementById("bgDownloadBtn");
+    btn.disabled = true; btn.textContent = "Changing background…";
+    outImg.style.display = "none"; outPh.style.display = "";
+    if (phP) phP.textContent = "Processing…";
+    dlBtn.style.display = "none";
+    setStatus("bgStatus", "Preparing…");
+    try {
+      const origCanvas = document.createElement("canvas");
+      origCanvas.width = window.bgNaturalW;
+      origCanvas.height = window.bgNaturalH;
+      origCanvas.getContext("2d").drawImage(window.bgOriginalImage, 0, 0, window.bgNaturalW, window.bgNaturalH);
+      const fullMaskCanvas = document.createElement("canvas");
+      fullMaskCanvas.width = window.bgNaturalW;
+      fullMaskCanvas.height = window.bgNaturalH;
+      const fmCtx = fullMaskCanvas.getContext("2d");
+      fmCtx.fillStyle = "black";
+      fmCtx.fillRect(0, 0, window.bgNaturalW, window.bgNaturalH);
+      fmCtx.drawImage(maskCanvas, 0, 0, window.bgNaturalW, window.bgNaturalH);
+      const fmData = fmCtx.getImageData(0, 0, window.bgNaturalW, window.bgNaturalH);
+      for (let i = 0; i < fmData.data.length; i += 4) {
+        const r = fmData.data[i], g = fmData.data[i + 1], b = fmData.data[i + 2], a = fmData.data[i + 3];
+        const painted = a > 20 && (g > 60 || r > 60 || b > 60);
+        const val = painted ? 255 : 0;
+        fmData.data[i] = fmData.data[i + 1] = fmData.data[i + 2] = val;
+        fmData.data[i + 3] = 255;
+      }
+      fmCtx.putImageData(fmData, 0, 0);
+      const form = new FormData();
+      form.append("image", await new Promise(r => origCanvas.toBlob(r, "image/png")), "image.png");
+      form.append("mask", await new Promise(r => fullMaskCanvas.toBlob(r, "image/png")), "mask.png");
+      form.append("mode", "bg");
+      form.append("prompt", prompt);
+      form.append("mask_blur", blur);
+      form.append("num_steps", "35");
+      form.append("guidance_scale", "7.5");
+      setStatus("bgStatus", "Generating new background (SD, ~30–60s)…");
+      const res = await fetch(BASE_URL_BG + "/api/inpaint", {
+        method: "POST",
+        headers: { "ngrok-skip-browser-warning": "1" },
+        body: form
+      });
+      if (!res.ok) throw new Error("Server " + res.status + ": " + await res.text());
+      const ctype = res.headers.get("content-type") || "";
+      if (!ctype.includes("image")) {
+        const errText = await res.text();
+        throw new Error(errText || "Backend did not return an image. Run COLAB_BACKGROUND_SD.py in Colab.");
+      }
+      const blob = await res.blob();
+      if (blob.size < 500) throw new Error("Empty image — restart Colab and update BASE_URL_BG");
+      const showResult = (url) => {
+        outPh.style.display = "none";
+        outImg.style.display = "block";
+        dlBtn.style.display = "flex";
+        setStatus("bgStatus", "Done! Check result below.", false);
+        outImg.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        const maskCv = document.getElementById("bgMask");
+        maskCv.getContext("2d").clearRect(0, 0, maskCv.width, maskCv.height);
+      };
+      const url = URL.createObjectURL(blob);
+      outImg.onload = () => showResult(url);
+      outImg.onerror = () => { throw new Error("Could not display result image"); };
+      outImg.src = url;
+      if (outImg.complete) showResult(url);
+    } catch (e) {
+      outPh.style.display = "flex";
+      if (phP) phP.textContent = e.message;
+      setStatus("bgStatus", "Failed", false);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Change Background";
+    }
+  }
+  
+
+    
+
+
+  </script>
+</body>
+</html>
